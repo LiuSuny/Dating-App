@@ -9,7 +9,7 @@ namespace API.Entities
    [Table("Photos")]
     public class Photo
     {
-        public int Id { get; set; }
+        public int Id { get; set; } 
 
           //url of the photos 
         public string Url {get; set;}
