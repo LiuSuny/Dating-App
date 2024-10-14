@@ -33,6 +33,8 @@ namespace API
            services.AddApplicationServices(_config); //created an extension method for it 
 
             services.AddControllers();
+                    //.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new DateOnlyConverter()));
+            
             services.AddCors();
             
             services.AddIdentityServices(_config);

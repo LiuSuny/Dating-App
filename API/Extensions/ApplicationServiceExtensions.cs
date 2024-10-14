@@ -22,12 +22,12 @@ namespace API.Extensions
             {
                 options.UseSqlite(config.GetConnectionString("DefaultConnection"));
             });                        
+            services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IUserRepository, UserRepository>();            
             //services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly); //finding where we mapped our automapper class
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); 
-            services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
-            services.AddScoped<IPhotoService, PhotoService>();
             return services;
          }
     }

@@ -16,13 +16,14 @@ namespace API.Services
        
         public PhotoService(IOptions<CloudinarySettings> config)
        {
-            var acc = new Account(
+            var myAccount = new Account
+            (
             config.Value.CloudName,
             config.Value.ApiKey,
             config.Value.ApiSecret
             );
-            _cloudinary = new Cloudinary(acc);
-            _cloudinary.Api.Secure = true;
+            _cloudinary = new Cloudinary(myAccount);
+            //_cloudinary.Api.Secure = true;
 
         }
 
@@ -39,7 +40,8 @@ namespace API.Services
                 {
                     File = new FileDescription(file.FileName, stream),
                     Transformation = new Transformation().Height(500)
-                     .Width(500).Crop("fill").Gravity("face")
+                     .Width(500).Crop("fill").Gravity("face"),
+                    Folder="da-net8"
                 };
                 //uploadResult = await _cloudinary.UploadAsync(uploadParam);
                 uploadResult = await _cloudinary.UploadAsync(uploadParam);
@@ -52,9 +54,9 @@ namespace API.Services
             
             var deleteParam = new DeletionParams(publicId);
 
-           var result = await _cloudinary.DestroyAsync(deleteParam);
+            return await _cloudinary.DestroyAsync(deleteParam);
            
-           return result;
+           
         }
     }
 }

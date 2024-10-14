@@ -19,12 +19,12 @@ namespace API.Entities
 
          //this help with photo storage
         public string PublicId {get; set;}
-
-         //relationship
-        public AppUser AppUser {get; set;} //defining the relationship
-
+       
         //acting a foreign key
         public int AppUserId {get; set;} //defining the relationship
+       //relationship
+        public AppUser AppUser { get; set; } //defining the relationship
+
 
     }
 }

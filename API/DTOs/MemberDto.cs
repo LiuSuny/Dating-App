@@ -45,8 +45,8 @@ namespace API.DTOs
         //country
         public string Country {get; set;}
 
-         //Collection of class photo
-        public ICollection<PhotoDto> Photos {get; set;} 
+        //Collection of class photo
+        public List<PhotoDto> Photos { get; set; }
 
     }
 }

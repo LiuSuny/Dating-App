@@ -66,45 +66,29 @@ namespace API.Controllers
         }
 
         [HttpPost("add-photo")]
-        public async Task<ActionResult<PhotoDto>> AddUserPhoto(IFormFile file)
+        public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
-           
-            //get user by name
             var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 
-            if (user == null) return NotFound();
+            if (user == null) return BadRequest("Cannot update user");
 
-            //result back from photoservice
             var result = await _photoService.AddPhotoAsync(file);
 
-            //checking if upload resut to an error check
-            if (result.Error != null)
-                return BadRequest(result.Error.Message);
+            if (result.Error != null) return BadRequest(result.Error.Message);
 
-            //create new photo from ...
             var photo = new Photo
             {
                 Url = result.SecureUrl.AbsoluteUri,
                 PublicId = result.PublicId
             };
-            //checking if the photo is a main photo or not and we can go ahead to st it as main
-            if (user.Photos.Count == 0)
-                photo.IsMain = true;
-            
-            ////if it is then add
+
             user.Photos.Add(photo);
 
-            //saving photos with help of mappers
             if (await _userRepository.SaveAllAsync())
-            {
-                return CreatedAtRoute(nameof(GetUser), new { username= user.UserName}, _mapper.Map<PhotoDto>(photo));       
-                   
-            }
+                return CreatedAtAction(nameof(GetUser),
+                    new { username = user.UserName }, _mapper.Map<PhotoDto>(photo));
 
-            //ese if not loaded badrequest
             return BadRequest("Problem adding photo");
-
-
         }
     }
 }

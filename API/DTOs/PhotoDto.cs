@@ -10,7 +10,7 @@ namespace API.DTOs
          public int Id { get; set; }
 
           //url of the photos 
-        public string Url {get; set;}
+        public string? Url {get; set;}
 
         //this check if this their main photo or not
         public bool IsMain {get; set;}

@@ -14,12 +14,11 @@ namespace API.Helpers
 
         public AutoMapperProfiles()
         {
-            CreateMap<AppUser, MemberDto>()   
-             .ForMember(dest => dest.PhotoUrl, opt => opt
-             .MapFrom(src => src.Photos.FirstOrDefault(x => x.IsMain).Url))
-                .ForMember(dest => dest.Age, opt => opt
-                .MapFrom(src => src.DateOfBirth.CalculateAge()));
-
+            CreateMap<AppUser, MemberDto>()
+             .ForMember(d => d.Age, o => o.MapFrom(s => s.DateOfBirth.CalculateAge()))
+            .ForMember(d => d.PhotoUrl, o =>
+                o.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain)!.Url));
+            CreateMap<string, DateOnly>().ConvertUsing(s => DateOnly.Parse(s));
             CreateMap<Photo, PhotoDto>();
             CreateMap<MemberUpdateDto, AppUser>().ReverseMap(); //if we want to go from AppUser to memberUpdateDto then we can go ahead and use reverseMap()
         }

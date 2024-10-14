@@ -17,12 +17,8 @@ namespace API.Entities
 
         //for salting password
         public byte[] PasswordSalt {get; set;}
-
-         //checking age
-         //public DateTime DateOFBirth {get; set;}
-
-         //TODO: NEW MIGRATION NEEDED TO UPDATE AGE 
-        public DateTime DateOfBirth {get; set;}
+         
+        public DateOnly DateOfBirth {get; set;}
 
          //know as name might be different like nickname
         public string KnownAs {get; set;}
@@ -51,12 +47,13 @@ namespace API.Entities
         //country
         public string Country {get; set;}
 
-         //Collection of class photo
-        public ICollection<Photo> Photos {get; set;} //one to many relationship in ef
+        //Collection of class photo
+        public List<Photo> Photos { get; set; } = new();//one to many relationship in ef
 
-        //  public int GetAge(){
-        //      return DateOFBirth.CalculateAge();
-        //  }
+        //public int GetAge()
+        //{
+        //    return DateOfBirth.CalculateAge();
+        //}
     }
    
 }
