@@ -53,6 +53,11 @@ export class PhotoEditorComponent {
     })
   }
 
+  deletePhoto(photoId: number){
+        this.memberService.deletePhoto(photoId).subscribe(() => {
+          this.member.photos = this.member.photos.filter(x => x.id !== photoId); //this filter out all other photo
+        })
+  }
 
   initializeUploader() {
     this.uploader = new FileUploader({
