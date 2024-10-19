@@ -21,6 +21,9 @@ namespace API.Helpers
             CreateMap<string, DateOnly>().ConvertUsing(s => DateOnly.Parse(s));
             CreateMap<Photo, PhotoDto>();
             CreateMap<MemberUpdateDto, AppUser>().ReverseMap(); //if we want to go from AppUser to memberUpdateDto then we can go ahead and use reverseMap()
+            CreateMap<RegisterDTO, AppUser>();
+
+
         }
     }
 }
