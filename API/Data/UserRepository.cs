@@ -43,14 +43,27 @@ namespace API.Data
 
         public async Task<PagedList<MemberDto>> GetMembersAsync(UserParam userParam)
         {
-           var query = _context.Users
-              .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
-              .AsNoTracking();
-
-              return await PagedList<MemberDto>.CreateAsync(query, userParam.PageNumber,
-              userParam.PageSize);
-
+           var query = _context.Users.AsQueryable();
              
+             // .AsQueryable();
+              //filtering using username
+              query = query.Where(u => u.UserName != userParam.CurrentUsername);
+               //filtering using gender
+              query = query.Where(u => u.Gender == userParam.Gender);
+
+            //adding filtering age             
+             var minDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParam.MaxAge - 1));
+             var maxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParam.MinAge));
+
+             query = query.Where(x => x.DateOfBirth > minDob && x.DateOfBirth < maxDob);
+
+              //.ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
+              //.AsNoTracking()
+              //this same as the line above just that we r filtering before get to code line below
+              return await PagedList<MemberDto>.CreateAsync(query.ProjectTo<MemberDto>(
+               _mapper.ConfigurationProvider ).AsNoTracking(),            
+              userParam.PageNumber, userParam.PageSize);
+                    
         }
 
         public async Task<AppUser> GetUserByIdAsync(int id)
