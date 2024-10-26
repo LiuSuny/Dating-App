@@ -30,12 +30,13 @@ namespace API.Controllers
             _mapper = mapper;          
         }
 
+         
       
          [HttpGet]      
          public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UserParam userParam)
         {   
             var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-
+             
             userParam.CurrentUsername = user.UserName;
 
             if(string.IsNullOrEmpty(userParam.Gender))
@@ -49,6 +50,27 @@ namespace API.Controllers
               
 
              return Ok(users);
+          
+             
+        }
+        
+         //[HttpGet("{id }", Name = "GetUsers")]      
+         public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsersById(int id)
+        {   
+            var user = await _userRepository.GetUserByIdAsync(User.GetUserId());
+             
+             UserParam userParam = new UserParam();
+
+            userParam.CurrentUsername = user.Id.ToString();
+            
+             var users = await _userRepository.GetMembersAsync(userParam);  
+              
+             Response.AddPaginationHeader(users.CurrentPage, users.PageSize,
+             users.TotalCount, users.TotalPages);
+              
+
+             return Ok(users);
+          
              
         }
 

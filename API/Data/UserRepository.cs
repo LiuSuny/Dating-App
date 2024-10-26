@@ -56,7 +56,16 @@ namespace API.Data
              var maxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParam.MinAge));
 
              query = query.Where(x => x.DateOfBirth > minDob && x.DateOfBirth < maxDob);
+              
+              //check lastive and sorting
 
+              query = userParam.OrderBy switch 
+              {
+                 "created" => query.OrderByDescending(u => u.Created),
+                 _ =>query.OrderByDescending(u => u.LastActive)
+               
+              };
+              
               //.ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
               //.AsNoTracking()
               //this same as the line above just that we r filtering before get to code line below
