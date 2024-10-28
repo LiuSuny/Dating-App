@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Member } from '../_models/member';
 import { MembersService } from '../_services/members.service';
+import { UserParams } from '../_models/userParams';
+import { Pagination } from '../_models/pagination';
 
 @Component({
   selector: 'app-lists',
@@ -15,9 +17,13 @@ export class ListsComponent implements OnInit{
    but not all of them are REQUIRED sort of like iqueryable in case of c#*/
 
   members: Partial<Member[]>;
+  pageNumber = 1;
+  pageSize = 5;
+  //userParams: UserParams;
+  pagination: Pagination;
 
   predicate = 'liked';
-
+  pa
   constructor(private memberService: MembersService) {}
 
 
@@ -26,9 +32,17 @@ export class ListsComponent implements OnInit{
   }
 
   loadLikes(){
-     this.memberService.getLikes(this.predicate).subscribe(response => {
-       this.members = response
-     })
+     this.memberService.getLikes
+     (this.predicate, this.pageNumber, this.pageSize)
+     .subscribe(response => {
+       this.members = response.result; //our member is store in result inside our model PaginationResult model
+        this.pagination = response.pagination;
+      })
+  }
+
+  pageChanged(event: any){
+    this.pageNumber = event.page;
+    this.loadLikes();
   }
 
 }

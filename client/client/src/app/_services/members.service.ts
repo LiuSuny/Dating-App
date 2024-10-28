@@ -110,9 +110,14 @@ export class MembersService {
       return this.http.post(this.baseUrl + 'likes/'+ username, {});//we must add empty body since it is post
   }
  
-  getLikes(predicate: string){
+  getLikes(predicate: string, pageNumber, pageSize){
+    //adding pagination our likes
+    let params = this.getPaginationHeader(pageNumber, pageSize);
+    params = params.append('predicate', predicate);
     //{url}likes?predicate=liked or likeBy (predicate represent)
-    return this.http.get<Partial<Member[]>>(this.baseUrl + 'likes?predicate='+ predicate);
+    //return this.http.get<Partial<Member[]>>(this.baseUrl + 'likes?predicate='+ predicate);
+    //passing the pagination instead
+    return this.getPaginatedResult<Partial<Member[]>>(this.baseUrl + 'likes', params);
 }
 
   private getPaginatedResult<T>(url, params){
