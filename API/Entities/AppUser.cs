@@ -49,6 +49,13 @@ namespace API.Entities
 
         //Collection of class photo
         public List<Photo> Photos { get; set; } = new();//one to many relationship in ef
+       
+        //list of liked the current login users have gotten 
+        public List<AppUserLike> LikedByUsers { get; set; } = new();
+
+        //list of current users that login user has liked 
+        public List<AppUserLike> LikedUsers { get; set; } = new();
+
 
         //public int GetAge()
         //{
