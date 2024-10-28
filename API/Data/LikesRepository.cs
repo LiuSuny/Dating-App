@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -27,26 +28,26 @@ namespace API.Data
             return await _context.Likes.FindAsync(sourceUserId, likedUserId);
         }
 
-        public async  Task<IEnumerable<LikesDto>> GetUserLikes(string predicate, int userId)
+        public async  Task<PagedList<LikesDto>> GetUserLikes(LikesParams likesParams)
         {
             var users =  _context.Users.OrderBy(u => u.UserName).AsQueryable();
             var likes =  _context.Likes.AsQueryable();
              
              //if the object is equal to liked
-            if(predicate == "liked"){
+            if(likesParams.Predicate == "liked"){
                 //then we filter and identify what is going on
-                likes = likes.Where(like => like.SourceUserId == userId);
+                likes = likes.Where(like => like.SourceUserId == likesParams.UserId);
                 users = likes.Select(like => like.TargetUser); // this give us users from our liked table and passing it to users table
 
             }
             
-             if(predicate == "likedBy"){
+             if(likesParams.Predicate == "likedBy"){
                 //then we filter and identify what is going on
-                likes = likes.Where(like => like.TargetUserId == userId);
+                likes = likes.Where(like => like.TargetUserId == likesParams.UserId);
                 users = likes.Select(like => like.SourceUser); 
             }
 
-            return await users.Select(user => new LikesDto{
+          var likeUsers = users.Select(user => new LikesDto{
                 
                 Username = user.UserName,
                 KnownAs = user.KnownAs,
@@ -55,7 +56,10 @@ namespace API.Data
                 City = user.City,
                 Id = user.Id
 
-            }).ToListAsync();
+            });
+
+            return await PagedList<LikesDto>
+            .CreateAsync(likeUsers, likesParams.PageNumber, likesParams.PageSize);
         }
 
          //getting user with collection of likes with Id

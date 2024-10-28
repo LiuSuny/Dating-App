@@ -105,6 +105,15 @@ export class MembersService {
     return this.http.delete(this.baseUrl + 'users/delete-photo/'+ photoId);
   }
 
+  addLikes(username: string){
+    //{url}likes/username
+      return this.http.post(this.baseUrl + 'likes/'+ username, {});//we must add empty body since it is post
+  }
+ 
+  getLikes(predicate: string){
+    //{url}likes?predicate=liked or likeBy (predicate represent)
+    return this.http.get<Partial<Member[]>>(this.baseUrl + 'likes?predicate='+ predicate);
+}
 
   private getPaginatedResult<T>(url, params){
 
