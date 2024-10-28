@@ -22,6 +22,13 @@ namespace API.Helpers
             CreateMap<Photo, PhotoDto>();
             CreateMap<MemberUpdateDto, AppUser>().ReverseMap(); //if we want to go from AppUser to memberUpdateDto then we can go ahead and use reverseMap()
             CreateMap<RegisterDTO, AppUser>();
+            CreateMap<Message, MessageDto>()
+                   .ForMember(dest => dest.SenderPhotoUrl, 
+                   opt => opt.MapFrom(src => src.Sender.Photos.FirstOrDefault(p => p.IsMain).Url))
+                   .ForMember(dest => dest.RecipientPhotoUrl,
+                   opt => opt.MapFrom(src => src.Recipient.Photos.FirstOrDefault(p => p.IsMain).Url));
+
+
 
 
         }

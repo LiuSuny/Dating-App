@@ -55,6 +55,9 @@ namespace API.Entities
 
         //list of current users that login user has liked 
         public List<AppUserLike> LikedUsers { get; set; } = new();
+        public List<Message> MessagesSent { get; set; } = new();
+        public List<Message> MessagesReceived { get; set; } = new();
+
 
 
         //public int GetAge()

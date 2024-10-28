@@ -8,6 +8,7 @@ namespace API.Data
         //creating our db table
         public DbSet<AppUser> Users { get; set; }
         public DbSet<AppUserLike> Likes { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         //default ctor
         public DataContext(DbContextOptions options) : base(options) { }
@@ -39,7 +40,18 @@ namespace API.Data
                     .WithMany(l => l.LikedByUsers) //liking many others
                    .HasForeignKey(s => s.TargetUserId) //specifying the foreign key
                    .OnDelete(DeleteBehavior.Cascade); //delete the user then we delete entity including the likes
-
+              
+              //first part of the relationship to our AppUser table
+            builder.Entity<Message>()
+                   .HasOne(u => u.Recipient)
+                   .WithMany(m => m.MessagesReceived)
+                   .OnDelete(DeleteBehavior.Restrict); // prevent user from deleting if other user has not read the message
+           
+           //second part of the relationship to our AppUser table
+         builder.Entity<Message>()
+                   .HasOne(u => u.Sender)
+                   .WithMany(m => m.MessagesSent)
+                   .OnDelete(DeleteBehavior.Restrict); // prevent user from deleting if other user has not read the message
          
        }
     }
