@@ -26,8 +26,10 @@ namespace API
                 //Returns a service object of type DataContext.
                 var context = services.GetRequiredService<DataContext>();
                 var userManager = services.GetRequiredService<UserManager<AppUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
+
                 await context.Database.MigrateAsync(); //this line create db if it doesn't exist and seed data if there is pending one
-                await Seed.SeedUsers(userManager); //seeding our data
+                await Seed.SeedUsers(userManager, roleManager); //seeding our data
             }
             catch (Exception ex)
             {
