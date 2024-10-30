@@ -6,14 +6,16 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
     public class Seed
     {
-        public static async Task SeedUsers(DataContext context){
-            if(await context.Users.AnyAsync())return; //checking if there is any data
+        public static async Task SeedUsers(UserManager<AppUser> userManager)
+        {
+            if(await userManager.Users.AnyAsync())return; //checking if there is any data
 
             var userData = await System.IO.File.ReadAllTextAsync("Data/UserSeedData.json");
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -23,16 +25,22 @@ namespace API.Data
             //Once it users is in list form we go ahead to add it to our db using foreach
             foreach(var user in users)
             {
-                using var hmac = new HMACSHA512(); //HMACSHA512()
-
+                #region We now user identityUser
+                //using var hmac = new HMACSHA512(); //HMACSHA512()
+                 #endregion
+                  
                 user.UserName = user.UserName.ToLower();
-                user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("Pa$$w0rd"));
-                user.PasswordSalt = hmac.Key;
+                
+                   #region We now user identityUser
+                // user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("Pa$$w0rd"));
+                // user.PasswordSalt = hmac.Key;
+                    #endregion
 
-                 context.Users.Add(user);
+                //await  context.Users.Add(user);
+                await userManager.CreateAsync(user, "Pa$$w0rd");
             }
-           
-           await context.SaveChangesAsync(); 
+             //Note: the UserManager take care of saving the password to do db automatically without adding the savechanges
+             //await context.SaveChangesAsync(); 
         }
     }
 }

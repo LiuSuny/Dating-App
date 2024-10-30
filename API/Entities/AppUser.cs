@@ -1,23 +1,26 @@
 ﻿
 
 using API.Extensions;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Entities
 {
-    public class AppUser
+    public class AppUser : IdentityUser<int> //note we are using IdentityUser<int> int b/c we dont want too much refactor in our code
     {
-        //User Id
-        public int Id { get; set; }
 
-        //User name
-        public string UserName { get; set; }
+        #region since we inherit from identityuser no need 
+
+        // //User name
+        // public string UserName { get; set; }
         
-        //for hashing our password
-        public byte[] PasswordHash {get; set;}
+        // //for hashing our password
+        // public byte[] PasswordHash {get; set;}
 
-        //for salting password
-        public byte[] PasswordSalt {get; set;}
-         
+        // //for salting password
+        // public byte[] PasswordSalt {get; set;}
+
+         #endregion
+
         public DateOnly DateOfBirth {get; set;}
 
          //know as name might be different like nickname
@@ -58,8 +61,9 @@ namespace API.Entities
         public List<Message> MessagesSent { get; set; } = new();
         public List<Message> MessagesReceived { get; set; } = new();
 
+        public List<AppUserRole> UserRoles {get; set;}
 
-
+ 
         //public int GetAge()
         //{
         //    return DateOfBirth.CalculateAge();

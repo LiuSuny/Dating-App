@@ -1,12 +1,16 @@
 ﻿using API.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<AppUser, AppRole, int, IdentityUserClaim<int>,
+         AppUserRole, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
-        //creating our db table
-        public DbSet<AppUser> Users { get; set; }
+        //creating our db table we r overriding this table b/c IdentityDbContext provide us with one
+        //public DbSet<AppUser> Users { get; set; }
+
         public DbSet<AppUserLike> Likes { get; set; }
         public DbSet<Message> Messages { get; set; }
 
@@ -19,6 +23,20 @@ namespace API.Data
        {
               base.OnModelCreating(builder);
             
+            //many to one reletaionship
+            builder.Entity<AppUser>()
+                   .HasMany(ur => ur.UserRoles)
+                   .WithOne(ur => ur.User)
+                   .HasForeignKey(ur => ur.UserId)
+                   .IsRequired();
+
+           //many to one reletaionship
+             builder.Entity<AppRole>()
+                   .HasMany(ur => ur.UserRoles)
+                   .WithOne(ur => ur.Role)
+                   .HasForeignKey(ur => ur.RoleId)
+                   .IsRequired();
+
             //configure our primary since we did not specify inside our AppUserLike entity
             //and it going be combination of sourceuserid and likeuserid
             builder.Entity<AppUserLike>().HasKey(k => new {

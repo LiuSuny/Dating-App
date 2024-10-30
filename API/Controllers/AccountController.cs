@@ -11,40 +11,55 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Controllers
 {
     public class AccountController: BaseApiController
     {
-        private readonly DataContext _context;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
         public readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
 
-        public AccountController(DataContext context, 
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
         ITokenService tokenService, IMapper mapper)
         {
             _mapper = mapper;
             _tokenService = tokenService;           
-            _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpPost("register")]
          public async Task<ActionResult<UserDTO>> Register(RegisterDTO registerDTO)
          {
+            //checking if the username already exist
             if(await UserExists(registerDTO.Username)) 
              return BadRequest("Username already taken");
             
+            //map it
             var user = _mapper.Map<AppUser>(registerDTO);
-            
-             using var hmac = new HMACSHA512();
-
-           
+             
+             #region 
+             //using var hmac = new HMACSHA512();
+             #endregion
+                //assign appuser to registerdto
                user.UserName = registerDTO.Username;
-               user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDTO.Password));
-               user.PasswordSalt = hmac.Key;
-            
-             _context.Users.Add(user);
-             await _context.SaveChangesAsync();
+
+               #region 
+              //  user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDTO.Password));
+              //  user.PasswordSalt = hmac.Key;
+              #endregion
+
+            //  _context.Users.Add(user);
+            //  await _context.SaveChangesAsync();
+
+            //creating user and password
+             var result = await _userManager.CreateAsync(user, registerDTO.Password);
+              
+              //next we check if it doesnt succeded
+              if(!result.Succeeded) return BadRequest(result.Errors);             
 
              return new UserDTO{
                 Username = user.UserName,
@@ -58,24 +73,32 @@ namespace API.Controllers
         [HttpPost("login")]
          public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDTO)
          {
-                                  
-              var user = await _context.Users
+              //getting the user                 
+              var user = await _userManager.Users
                .Include(x => x.Photos)
-              .SingleOrDefaultAsync (x => x.UserName == loginDTO.Username);
-                         
+              .SingleOrDefaultAsync (x => x.UserName == loginDTO.Username.ToLower());
+              
+              //checking if user name is null then return Unauthorized
               if(user ==null) return Unauthorized("Invalid username");
 
-             using var hmac = new HMACSHA512(user.PasswordSalt);
+               #region we are now using identityuser
+            //  using var hmac = new HMACSHA512(user.PasswordSalt);
               
-              var ComputeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
+            //   var ComputeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
         
-                for(int i =0; i<ComputeHash.Length; i++)
-                {
+            //     for(int i =0; i<ComputeHash.Length; i++)
+            //     {
 
-                    if(ComputeHash[i] != user.PasswordHash[i]){
-                        return Unauthorized("Invalid password");
-                    }
-                }           
+            //         if(ComputeHash[i] != user.PasswordHash[i]){
+            //             return Unauthorized("Invalid password");
+            //         }
+            //     }           
+              #endregion
+             
+              //however if username is find and succeeded then 
+              var result = await _signInManager.CheckPasswordSignInAsync(user, loginDTO.Password, false);
+              
+               if(!result.Succeeded) return Unauthorized();  
 
               return new UserDTO{
                 Username = user.UserName,
@@ -88,7 +111,7 @@ namespace API.Controllers
 
            private async Task<bool> UserExists(string username)
            {
-                   return await _context.Users.AnyAsync(x => x.UserName == username.ToLower());
+                   return await _userManager.Users.AnyAsync(x => x.UserName == username.ToLower());
            }
     
     }

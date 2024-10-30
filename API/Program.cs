@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using API.Entities;
 
 
 namespace API
@@ -23,8 +25,9 @@ namespace API
                 //Get service of type DataContext from the IServiceProvider and
                 //Returns a service object of type DataContext.
                 var context = services.GetRequiredService<DataContext>();
+                var userManager = services.GetRequiredService<UserManager<AppUser>>();
                 await context.Database.MigrateAsync(); //this line create db if it doesn't exist and seed data if there is pending one
-                await Seed.SeedUsers(context); //seeding our data
+                await Seed.SeedUsers(userManager); //seeding our data
             }
             catch (Exception ex)
             {
