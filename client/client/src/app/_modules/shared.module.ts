@@ -9,7 +9,7 @@ import {BsDatepickerModule} from 'ngx-bootstrap/datepicker';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ButtonsModule } from 'ngx-bootstrap/buttons'
 import { TimeagoModule } from "ngx-timeago"; ///import after installing it
-
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 @NgModule({
   declarations: [],
@@ -25,7 +25,8 @@ import { TimeagoModule } from "ngx-timeago"; ///import after installing it
     BsDatepickerModule.forRoot(),
     PaginationModule.forRoot(),
     ButtonsModule.forRoot(), //because it angular bootstrap module we need forroot()
-    TimeagoModule.forRoot() //need to install
+    TimeagoModule.forRoot(), //need to install
+    ModalModule.forRoot() //this allow popup bar when click on buttom ngx-bootstrap modals
   ],
   exports : [
     BsDropdownModule,
@@ -36,7 +37,8 @@ import { TimeagoModule } from "ngx-timeago"; ///import after installing it
     BsDatepickerModule,
     PaginationModule,
     ButtonsModule,
-    TimeagoModule
+    TimeagoModule,
+    ModalModule
   ]
 })
 export class SharedModule { }
