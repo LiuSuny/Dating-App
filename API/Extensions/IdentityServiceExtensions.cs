@@ -15,25 +15,49 @@ namespace API.Extensions
          {
             //Adding injecting authentication service for users
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options => {
-                        options.TokenValidationParameters = new TokenValidationParameters
+                    .AddJwtBearer(
+                        options => {
+                             options.TokenValidationParameters = new TokenValidationParameters
+                            {
+
+                                // Validate signature
+                                ValidateIssuerSigningKey = true,
+
+                                // Set signing key
+                                IssuerSigningKey = new SymmetricSecurityKey(
+                                    // Get our secret key from configuration
+                                    Encoding.UTF8.GetBytes(config["TokenKey"])
+                                ),
+
+                                // Validate issuer
+                                ValidateIssuer = false, //the issuer is our API server
+
+                                // Validate audience
+                                ValidateAudience = false //our angular application --client side 
+                           };
+
+                      //this query string config is meant to config our SIGNAIR authentication as 
+                      //as signaIR does not authencate header but nnstead query string!
+
+                      options.Events = new JwtBearerEvents 
+                      {
+                        OnMessageReceived = context => 
                         {
+                            //access to the token
+                            var accessToken = context.Request.Query["access_token"];
 
-                        // Validate signature
-                        ValidateIssuerSigningKey = true,
+                            //checking the path of this request
+                            var path = context.HttpContext.Request.Path;
+                            //checking if the path has access token
+                            if(!string.IsNullOrEmpty(accessToken) 
+                            && path.StartsWithSegments("/hubs"))
+                            {
+                                context.Token = accessToken;
+                            }
 
-                         // Set signing key
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            // Get our secret key from configuration
-                            Encoding.UTF8.GetBytes(config["TokenKey"])
-                        ),
-
-                        // Validate issuer
-                        ValidateIssuer = false, //the issuer is our API server
-
-                        // Validate audience
-                        ValidateAudience = false //our angular application --client side 
-                        };
+                            return Task.CompletedTask;
+                        }
+                      };
 
                     }); 
 

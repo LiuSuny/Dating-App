@@ -5,6 +5,7 @@ using API.Extensions;
 using API.Interfaces;
 using API.Middleware;
 using API.Services;
+using API.SignaIR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -38,6 +39,9 @@ namespace API
             services.AddCors();
             
             services.AddIdentityServices(_config);
+
+           //injecting the signaIR service 
+            services.AddSignalR();
             
         }
 
@@ -63,7 +67,10 @@ namespace API
             app.UseRouting();
            
             app.UseCors(x => 
-            x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
+            x.AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials() //we need to supply b/c of use of singaIR accesstoken
+            .WithOrigins("http://localhost:4200"));
 
             app.UseAuthentication();
            
@@ -72,6 +79,8 @@ namespace API
             app.UseEndpoints(endpoint =>
             {
                 endpoint.MapControllers();
+                //telling our routing or our api about signaIR endpoint and the (hubs/presence--the route to access from)
+                endpoint.MapHub<PresenceHub>("hubs/presence");
             });
 
              
