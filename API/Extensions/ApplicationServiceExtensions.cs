@@ -7,6 +7,7 @@ using API.Entities;
 using API.Helpers;
 using API.Interfaces;
 using API.Services;
+using API.SignaIR;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,7 @@ namespace API.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<LogUserActivity>();
+            services.AddSingleton<PresenceTracker>(); //since we require to get hold of this class from anywhere in our app we inject it here so it can be global
             services.AddScoped<IUserRepository, UserRepository>(); 
             services.AddScoped<ILikesRepository, LikesRepository>();  
             services.AddScoped<IMessageRepository, MessageRepository>();            
