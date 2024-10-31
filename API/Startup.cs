@@ -81,6 +81,9 @@ namespace API
                 endpoint.MapControllers();
                 //telling our routing or our api about signaIR endpoint and the (hubs/presence--the route to access from)
                 endpoint.MapHub<PresenceHub>("hubs/presence");
+                //Message hub endpoint
+                endpoint.MapHub<MessageHub>("hubs/message");
+
             });
 
              
