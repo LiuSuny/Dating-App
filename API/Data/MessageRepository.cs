@@ -129,7 +129,7 @@ namespace API.Data
                     message.DateRead = DateTime.UtcNow;
                   }
                   //saved it
-                  await _context.SaveChangesAsync();
+                  //await _context.SaveChangesAsync();
                 }
                  
                  //we map then into dto
@@ -141,9 +141,9 @@ namespace API.Data
            _context.Connections.Remove(connection);
         }
 
-        public async Task<bool> SaveAllAsync()
-        {
-            return await _context.SaveChangesAsync() > 0; //this allow us to return boolean
-        }
+        // public async Task<bool> SaveAllAsync()
+        // {
+        //     return await _context.SaveChangesAsync() > 0; //this allow us to return boolean
+        // }
     }
 }

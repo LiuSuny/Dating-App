@@ -48,9 +48,10 @@ namespace API.Extensions
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<LogUserActivity>();
             services.AddSingleton<PresenceTracker>(); //since we require to get hold of this class from anywhere in our app we inject it here so it can be global
-            services.AddScoped<IUserRepository, UserRepository>(); 
-            services.AddScoped<ILikesRepository, LikesRepository>();  
-            services.AddScoped<IMessageRepository, MessageRepository>();            
+            //services.AddScoped<IUserRepository, UserRepository>(); 
+            //services.AddScoped<ILikesRepository, LikesRepository>();  
+            //services.AddScoped<IMessageRepository, MessageRepository>(); 
+            services.AddScoped<IUnitOfWork, UnitOfWork>();            
             //services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly); //finding where we mapped our automapper class
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); 
             return services;

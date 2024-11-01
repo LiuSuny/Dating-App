@@ -96,10 +96,10 @@ namespace API.Data
              
         }
 
-        public async Task<bool> SaveAllAsync()
-        {
-            return await _context.SaveChangesAsync() > 0; //saving all changes
-        }
+        // public async Task<bool> SaveAllAsync()
+        // {
+        //     return await _context.SaveChangesAsync() > 0; //saving all changes
+        // }
 
         //this modified any updated entity
         public void Update(AppUser user)
