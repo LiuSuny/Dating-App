@@ -11,8 +11,10 @@ namespace API.SignaIR
         = new Dictionary<string, List<string>>(); 
 
          //method to add users to the dictionary when they connect
-         public Task UserConnected(string username, string connectionId)
+         public Task<bool> UserConnected(string username, string connectionId)
          {
+            bool isOnline = false;
+
             //since dictionary is not thread safe we have to use thread to lock the users when they r connected
 
             lock(OnlineUsers)
@@ -27,25 +29,31 @@ namespace API.SignaIR
                 else
                 {
                     OnlineUsers.Add(username, new List<string>{connectionId});
+                     isOnline = true;
                 }
             }
-            return Task.CompletedTask;
+            return Task.FromResult(isOnline);
          }
+         
          //user diconnected
-        public Task UserDisConnected(string username, string connectionId)
+        public Task<bool> UserDisConnected(string username, string connectionId)
         {
+            bool isOffline = false;
+
             lock(OnlineUsers)
             {
                 //if there is no user with online presence then we complete our task
-                 if(!OnlineUsers.ContainsKey(username)) return Task.CompletedTask;
+                 if(!OnlineUsers.ContainsKey(username))  return Task.FromResult(isOffline);
                  //then we remove
                  OnlineUsers[username].Remove(connectionId);
 
-                 if(OnlineUsers[username].Count == 0){
+                 if(OnlineUsers[username].Count == 0)
+                 {
                     OnlineUsers.Remove(username);
+                    isOffline = true;
                  }
             }
-            return Task.CompletedTask;
+             return Task.FromResult(isOffline);
         }
 
         //Method to get all online users
@@ -67,5 +75,22 @@ namespace API.SignaIR
                  }
                  return Task.FromResult(onlineUsers); // The successfully completed task.
           }
+
+            public Task<List<string>> GetConnectionForUser(string username)
+            {
+                List<string> connectionId;
+                
+                lock(OnlineUsers)
+                {
+                    /*GetValueOrDefault(username) Tries to get the value associated with the specified key in 
+                    the dictionary.
+                    Returns:A List instance. When the method is successful, 
+                    the returned object is the value associated with the specified key.
+                     When the method fails, it returns the default value for List.*/
+
+                    connectionId = OnlineUsers.GetValueOrDefault(username);                              
+                }
+                  return Task.FromResult(connectionId);
+            }
     }
 }

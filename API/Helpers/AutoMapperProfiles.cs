@@ -18,7 +18,6 @@ namespace API.Helpers
               .ForMember(d => d.Age, o => o.MapFrom(s => s.DateOfBirth.CalculateAge()))
             .ForMember(dest => dest.PhotoUrl, opt =>
                 opt.MapFrom(src => src.Photos.FirstOrDefault(x => x.IsMain).Url));
-            CreateMap<string, DateOnly>().ConvertUsing(s => DateOnly.Parse(s));
             CreateMap<Photo, PhotoDto>();
             CreateMap<MemberUpdateDto, AppUser>().ReverseMap(); //if we want to go from AppUser to memberUpdateDto then we can go ahead and use reverseMap()
             CreateMap<RegisterDTO, AppUser>();
@@ -27,7 +26,9 @@ namespace API.Helpers
                    opt => opt.MapFrom(src => src.Sender.Photos.FirstOrDefault(p => p.IsMain).Url))
                    .ForMember(dest => dest.RecipientPhotoUrl,
                    opt => opt.MapFrom(src => src.Recipient.Photos.FirstOrDefault(p => p.IsMain).Url));
-
+            // CreateMap<string, DateOnly>().ConvertUsing(s => DateOnly.Parse(s));
+            CreateMap<DateTime, DateTime>()
+                 .ConvertUsing(d => DateTime.SpecifyKind(d, DateTimeKind.Utc));
 
 
 

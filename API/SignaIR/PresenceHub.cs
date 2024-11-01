@@ -22,32 +22,34 @@ namespace API.SignaIR
         public override async Task OnConnectedAsync()
         {
             //tracking user with username and id --connectionId from Hub
-            await _tracker.UserConnected(Context.User.GetUsername(), Context.ConnectionId);
-
+           var isOnline = await _tracker.UserConnected(Context.User.GetUsername(), Context.ConnectionId);
+            if(isOnline)
             //Clients, context and sendasync are all part of hub properties we implement method when user is online
             await Clients.Others.SendAsync("UserIsOnline", Context.User.GetUsername());
 
             //Getting list of all current online user
             var currentUsers = await _tracker.GetOnlineUsers();
-             await Clients.All.SendAsync("GetOnlineUsers", currentUsers);
+             await Clients.Caller.SendAsync("GetOnlineUsers", currentUsers);
             
         }
         
             //overriding the hub virtual method
          public override async Task OnDisconnectedAsync(Exception exception)
         {
-            //tracking user with username and id --connectionId from Hub
-            await _tracker.UserDisConnected(Context.User.GetUsername(), Context.ConnectionId);
 
+            //tracking user with username and id --connectionId from Hub
+           var isOffline = await _tracker.UserDisConnected(Context.User.GetUsername(), Context.ConnectionId);
+              if(isOffline)
             //Clients, context and sendasync are all part of hub properties we implement method when user is offline
             await Clients.Others.SendAsync("UserIsOffOnline", Context.User.GetUsername());
             
-            //Getting list of all current online user
-            var currentUsers = await _tracker.GetOnlineUsers();
-             await Clients.All.SendAsync("GetOnlineUsers", currentUsers);
+            // //Getting list of all current online user
+            // var currentUsers = await _tracker.GetOnlineUsers();
+            //  await Clients.All.SendAsync("GetOnlineUsers", currentUsers);
             
             //if there is exception we pass it on to the base class to handle
             await base.OnDisconnectedAsync(exception);
         }
+
     }
 }

@@ -17,13 +17,18 @@ namespace API.SignaIR
         private readonly IMapper _mappper;       
         private readonly IMessageRepository _messageRepository;
         private readonly IUserRepository _userRepository;
+        private readonly  IHubContext<PresenceHub> _presenceHub;
+         private readonly PresenceTracker _tracker;
         public MessageHub(IMessageRepository messageRepository,
-        IMapper mappper, IUserRepository userRepository)
+        IMapper mappper, IUserRepository userRepository,
+         IHubContext<PresenceHub> presenceHub, PresenceTracker tracker)
         {
+            _tracker = tracker;
             _mappper = mappper;
             _messageRepository = messageRepository;
             _userRepository = userRepository;
-        }
+            _presenceHub = presenceHub;
+        } 
 
           //overriding the hub virtual method
         public override async Task OnConnectedAsync()
@@ -36,16 +41,24 @@ namespace API.SignaIR
 
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
+             var group = await AddToGroup(groupName);
+             await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
+             
+
             //if a user join a group
             var message = await _messageRepository.GetMessageThread(Context.User.GetUsername(),
             otherUser);
             //make user send message
-            await Clients.Group(groupName).SendAsync("ReceiveMessageThread", message);
+            await Clients.Caller.SendAsync("ReceiveMessageThread", message);
         }
 
           //overriding the hub virtual method to disconnect user
          public override async Task OnDisconnectedAsync(Exception exception)
         {
+           var group = await RemoveFromMessageGroup();
+
+            await Clients.Group(group.Name).SendAsync("UpdatedGroup", group);
+
            await base.OnDisconnectedAsync(exception);
         }
         
@@ -79,15 +92,76 @@ namespace API.SignaIR
               RecipientUserName = recipient.UserName,
               Content = createMessageDto.Content
            };
+             var groupName = GetGroupName(sender.UserName, recipient.UserName);
+             
+             var group = await _messageRepository.GetMessageGroup(groupName);
+
+             if(group.connections.Any(x => x.Username == recipient.UserName))
+             {
+                  message.DateRead = DateTime.UtcNow;
+             }
+             else{
+                var connections = await _tracker.GetConnectionForUser(recipient.UserName);
+                if(connections != null){
+                    await _presenceHub.Clients.Clients(connections)
+                    .SendAsync("NewMessageReceived", new{username = sender.UserName, 
+                    knownAs = sender.KnownAs});
+                }
+             }
 
              _messageRepository.AddMessage(message);
+
              if(await _messageRepository.SaveAllAsync())
              {
-                var group = GetGroupName(sender.UserName, recipient.UserName);
-                 await Clients.Group(group).SendAsync("NewMessage", _mappper.Map<MessageDto>(message));
+                 await Clients.Group(groupName).SendAsync("NewMessage", _mappper.Map<MessageDto>(message));
              } 
 
          }
+        
+       
+       /// <summary>
+       /// HubCallerContext is  abstract class that allow us access to User, claim and connectionId etc
+       /// </summary>
+       /// <param name="context"></param>
+       /// <param name="groupName"></param>
+       /// <returns></returns>
+        private async Task<Group> AddToGroup(string groupName)
+        {
+            //getting name
+             var group = await _messageRepository.GetMessageGroup(groupName); 
+             //attaching id to new user connections
+             var connection = new Connection(Context.ConnectionId, Context.User.GetUsername());
+              
+              //check if the new connect is null
+              if(group == null)
+              {
+                   group = new Group(groupName);
+                   _messageRepository.AddGroup(group);
+
+              }
+
+              group.connections.Add(connection);
+
+              if(await _messageRepository.SaveAllAsync()) 
+              return group;
+            throw new HubException("Unable to join to group");
+        }
+         
+         //remove from message group
+         private async Task<Group> RemoveFromMessageGroup()
+        {
+            var group = await _messageRepository
+            .GetGroupForConnection(Context.ConnectionId);
+
+            var connection = group.connections
+            .FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+
+            _messageRepository.RemoveConnection(connection);
+            if(await _messageRepository.SaveAllAsync()) return group;
+
+            throw new HubException("Failed to remove from group");
+
+        }
 
          /// <summary>
          ///Compare string method

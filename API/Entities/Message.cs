@@ -27,7 +27,7 @@ namespace API.Entities
         //time message is read 
         public DateTime? DateRead {get; set;} //we make this optional if the message has not be read
         //time the message is send
-        public DateTime DateMessageSent {get; set;} = DateTime.Now; //we make this optional if the message has not be read
+        public DateTime DateMessageSent {get; set;} = DateTime.UtcNow; //we make this optional if the message has not be read
          //check message sender is deleted
         public bool SendDelete { get; set; }
          //check message recipient is deleted
