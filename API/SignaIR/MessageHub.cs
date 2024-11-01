@@ -15,12 +15,11 @@ namespace API.SignaIR
     public class MessageHub : Hub
     {
         private readonly IMapper _mappper;       
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;      
         private readonly  IHubContext<PresenceHub> _presenceHub;
          private readonly PresenceTracker _tracker;
         public MessageHub(IUnitOfWork unitOfWork,
-        IMapper mappper, IUserRepository userRepository,
+        IMapper mappper, 
          IHubContext<PresenceHub> presenceHub, PresenceTracker tracker)
         {
             _tracker = tracker;
@@ -41,6 +40,7 @@ namespace API.SignaIR
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
              var group = await AddToGroup(groupName);
+             
              await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
              
 
@@ -81,9 +81,9 @@ namespace API.SignaIR
            throw new HubException("You can not send message to yourself");
 
            //getting hold of the message sender
-           var sender = await _userRepository.GetUserByUsernameAsync(username);
+           var sender = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
             //getting hold of the message recipient from our createdmessagedto
-           var recipient = await _userRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
+           var recipient = await _unitOfWork.UserRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
 
            if(recipient == null) throw new HubException("User not found");
 

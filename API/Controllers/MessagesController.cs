@@ -76,15 +76,15 @@ namespace API.Controllers
        }
 
 
-    //     [HttpGet("thread/{username}")] //geting hold our other paticipant username is since we can get hold of current user inside ur controller
-    //    public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageThread
-    //    (string username)
-    //    {
-    //         //geting hold of current username
-    //         var currentUsername = User.GetUsername();
-    //         //other paticipant username
-    //         return Ok( await _unitOfWork.MessageRepository.GetMessageThread(currentUsername, username));
-    //    }
+        [HttpGet("thread/{username}")] //geting hold our other paticipant username is since we can get hold of current user inside ur controller
+       public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageThread
+       (string username)
+       {
+            //geting hold of current username
+            var currentUsername = User.GetUsername();
+            //other paticipant username
+            return Ok( await _unitOfWork.MessageRepository.GetMessageThread(currentUsername, username));
+       }
         
         
         [HttpDelete("{id}")]
