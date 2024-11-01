@@ -28,7 +28,7 @@ export class HomeComponent  implements OnInit{
   }
 
   // getUsers(){
-  //   this.httpClient.get('https://localhost:5000/api/users').subscribe(users =>
+  //   this.httpClient.get('https:///api/users').subscribe(users =>
   //     this.users = users
 
   //     //console.log('error response from api', response);

@@ -1,0 +1,4 @@
+<!-- NOTES: RUN ng build whenever you have enough memory on you computer to generate a 
+wwwroot angular static file in our .net API folder and Remember to go into angular.json and change the path to outputPath to---
+ "outputPath": "C:/Users/User/Documents/DatingApp/API/wwwroot", and run this command 
+ ng build --configuration production to generate four file inside the wwwroot fold-->

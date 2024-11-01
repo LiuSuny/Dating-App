@@ -17,7 +17,7 @@ export class AdminService {
   }
 
   updateUserRole(username: string, roles: string[]){
-    //https://localhost:5000/api/admin/edit-roles/lisa?roles=Moderator,Member
+    //https:///api/admin/edit-roles/lisa?roles=Moderator,Member
     return this.http.post(this.baseUrl + 'admin/edit-roles/' +username + '?roles=' + roles, {});
   }
 }

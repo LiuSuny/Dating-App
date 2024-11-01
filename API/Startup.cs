@@ -75,7 +75,10 @@ namespace API
             app.UseAuthentication();
            
             app.UseAuthorization();
-           
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseEndpoints(endpoint =>
             {
                 endpoint.MapControllers();
@@ -83,7 +86,7 @@ namespace API
                 endpoint.MapHub<PresenceHub>("hubs/presence");
                 //Message hub endpoint
                 endpoint.MapHub<MessageHub>("hubs/message");
-
+                //endpoint.MapFallbackToController("index", "FallBack"); //uncomment once u have wwwroot folder
             });
 
              
